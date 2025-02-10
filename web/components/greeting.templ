@@ -1,0 +1,91 @@
+package components
+
+import (
+	"fmt"
+	datastar "github.com/starfederation/datastar/sdk/go"
+)
+
+const rows = 25
+const cols = 5
+
+templ Greeting(selectedPokemon string) {
+	<!-- Container with some padding -->
+	<div class="inline-block">
+		<table
+			id="table"
+			class="border-collapse table-fixed border border-gray-300"
+			data-signals-key-pressed="null"
+		>
+			<tbody>
+				for row := 0; row < rows; row++ {
+					<tr>
+						for col := 0; col < cols; col++ {
+							// @Cell(fmt.Sprintf("cell-%d-%d", row, col), CellDropdownOpts{})
+							@InactiveCell(fmt.Sprintf("cell-%d-%d", row, col), ".")
+						}
+					</tr>
+				}
+			</tbody>
+		</table>
+	</div>
+}
+
+templ InactiveCell(id, value string) {
+	<td
+		class="w-[100px] border border-gray-300 focus:border-indigo-500 focus:border-2"
+		id={ id }
+		tabindex="0"
+		data-ondblclick={ datastar.GetSSE("/cell/%s/edit?value=%s", id, value) }
+		data-on-keydown={ fmt.Sprintf(`
+			if (evt.key.length !== 1 || evt.ctrlKey || evt.metaKey) return;
+			$keyPressed = evt.key;
+			%s;
+		`, datastar.GetSSE("/cell/%s/edit?value=%s", id, value)) }
+	>
+		{ value }
+		// data-on-click={ datastar.GetSSE("/cell/%s/select?value=%s", id, value) }
+		// data-ondblclick={ datastar.GetSSE("/cell/%s/edit?value=%s", id, value) }
+		// data-on-click={ datastar.GetSSE("/cell/%s/edit?value=%s", id, value) }
+		// data-on-keydown={ fmt.Sprintf(`
+		// 	if (evt.key.length === 1 && !evt.ctrlKey && !evt.metaKey) return;
+		// 	%s
+		// `, datastar.GetSSE("/cell/%s/edit?value=%s", id, value)) }
+	</td>
+}
+
+templ Cell(id string) {
+	<td
+		id={ id }
+		class="w-[100px] border border-gray-300 focus:border-sky-500"
+	>
+		<input
+			data-scroll-into-view__focus
+			data-bind-cell
+			data-onblur={ datastar.GetSSE("/cell/%s", id) }
+			data-onfocus="this.setSelectionRange(this.value.length, this.value.length)"
+			type="text"
+			class="w-full"
+		/>
+		// if dropDownOpts.Options != nil {
+		// 	@CellDropdown(dropDownOpts)
+		// }
+	</td>
+}
+
+type CellDropdownOpts struct {
+	Options []string
+}
+
+templ CellDropdown(opts CellDropdownOpts) {
+	<div class="absolute left-0 top-full min-w-[300px] border border-gray-300 shadow-lg rounded-md z-10">
+		for _, option := range opts.Options {
+			<div class="p-2 hover:bg-gray-100 cursor-pointer">{ option }</div>
+		}
+	</div>
+}
+
+// 	class={ templ.KV("border-4 border-indigo-500", isSelected),
+// "w-full h-12 text-center border border-gray-300 focus:outline-none" }
+
+// data-on-input__debounce.1000ms={ datastar.GetSSE("/search") }
+//  data-on-click={ datastar.GetSSE("cell/select/%s", id) }
