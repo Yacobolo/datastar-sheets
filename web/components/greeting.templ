@@ -20,7 +20,6 @@ templ Greeting(selectedPokemon string) {
 				for row := 0; row < rows; row++ {
 					<tr>
 						for col := 0; col < cols; col++ {
-							// @Cell(fmt.Sprintf("cell-%d-%d", row, col), CellDropdownOpts{})
 							@InactiveCell(fmt.Sprintf("cell-%d-%d", row, col), ".")
 						}
 					</tr>
@@ -43,17 +42,10 @@ templ InactiveCell(id, value string) {
 		`, datastar.GetSSE("/cell/%s/edit?value=%s", id, value)) }
 	>
 		{ value }
-		// data-on-click={ datastar.GetSSE("/cell/%s/select?value=%s", id, value) }
-		// data-ondblclick={ datastar.GetSSE("/cell/%s/edit?value=%s", id, value) }
-		// data-on-click={ datastar.GetSSE("/cell/%s/edit?value=%s", id, value) }
-		// data-on-keydown={ fmt.Sprintf(`
-		// 	if (evt.key.length === 1 && !evt.ctrlKey && !evt.metaKey) return;
-		// 	%s
-		// `, datastar.GetSSE("/cell/%s/edit?value=%s", id, value)) }
 	</td>
 }
 
-templ Cell(id string) {
+templ Cell(id string, opts []string) {
 	<td
 		id={ id }
 		class="w-[100px] border border-gray-300 focus:border-sky-500"
@@ -66,19 +58,15 @@ templ Cell(id string) {
 			type="text"
 			class="w-full"
 		/>
-		// if dropDownOpts.Options != nil {
-		// 	@CellDropdown(dropDownOpts)
-		// }
+		if opts != nil {
+			@CellDropdown(opts)
+		}
 	</td>
 }
 
-type CellDropdownOpts struct {
-	Options []string
-}
-
-templ CellDropdown(opts CellDropdownOpts) {
+templ CellDropdown(opts []string) {
 	<div class="absolute left-0 top-full min-w-[300px] border border-gray-300 shadow-lg rounded-md z-10">
-		for _, option := range opts.Options {
+		for _, option := range opts {
 			<div class="p-2 hover:bg-gray-100 cursor-pointer">{ option }</div>
 		}
 	</div>

@@ -60,7 +60,8 @@ func startServer(ctx context.Context, logger *slog.Logger, port string) func() e
 
 		router.Handle("/static/*", http.StripPrefix("/static/", static(logger)))
 
-		err := routes.SetupRoutes(ctx, logger, router)
+		cleanup, err := routes.SetupRoutes(ctx, logger, router)
+		defer cleanup()
 		if err != nil {
 			return fmt.Errorf("error setting up routes: %w", err)
 		}

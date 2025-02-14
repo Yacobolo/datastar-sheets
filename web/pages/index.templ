@@ -1,12 +1,12 @@
 package pages
 
 import (
-	"myproject/web/components"
+	datastar "github.com/starfederation/datastar/sdk/go"
 	"myproject/web/layouts"
 )
 
 templ Index(title string) {
 	@layouts.Base(title) {
-		@components.Greeting("")
+		<div id="sheet-container" data-on-load={ datastar.GetSSE("/api/sheet") }></div>
 	}
 }

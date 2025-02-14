@@ -1,0 +1,31 @@
+package components
+
+import (
+	"fmt"
+	datastar "github.com/starfederation/datastar/sdk/go"
+)
+
+type SheetData struct {
+	// Sheet title
+	Title string
+	// Sheet content
+	Content string
+}
+
+templ SheetView(data *SheetData) {
+	<div
+		id="sheet-container"
+		class="sheet"
+		data-signals={ fmt.Sprintf("{title:'%s'}", data.Title) }
+	>
+		<input id="sheet-title" data-bind-title value={ data.Title }/>
+		<button
+			data-on-click={ datastar.PutSSE("/api/sheet") }
+			id="sheet-save"
+			class="btn"
+		>Save</button>
+		<div class="content">
+			{ data.Content }
+		</div>
+	</div>
+}
